@@ -1,0 +1,85 @@
+bundle:
+  name: agent_openai_agents_sdk
+
+variables:
+  budget_policy_id:
+    description: "Workspace budget policy ID for the app"
+  pghost:
+    description: "Lakebase PostgreSQL endpoint hostname"
+  pgdatabase:
+    description: "Lakebase database name"
+    default: "chatbot"
+  lakebase_endpoint_path:
+    description: "Lakebase endpoint path (projects/<name>/branches/<branch>/endpoints/primary)"
+  lakebase_project:
+    description: "Lakebase autoscaling project name"
+  lakebase_branch:
+    description: "Lakebase autoscaling branch name"
+    default: "production"
+  mlflow_experiment_id:
+    description: "MLflow experiment ID for tracing"
+  pguser:
+    description: "Lakebase PostgreSQL user (app service principal client ID)"
+
+resources:
+  apps:
+    agent_openai_agents_sdk:
+      name: "agent-openai-agents-sdk"
+      description: "A conversational agent backend and UI using OpenAI Agents SDK and MLflow AgentServer"
+      # TODO: Set your workspace budget policy ID (run: databricks apps get <app-name> --output json | jq .budget_policy_id)
+      budget_policy_id: "${var.budget_policy_id}"
+      source_code_path: ./
+      config:
+        command: ["uv", "run", "start-app"]
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: "databricks"
+          - name: MLFLOW_REGISTRY_URI
+            value: "databricks-uc"
+          - name: API_PROXY
+            value: "http://localhost:8000/invocations"
+          - name: CHAT_APP_PORT
+            value: "3000"
+          - name: CHAT_PROXY_TIMEOUT_SECONDS
+            value: "300"
+          - name: MLFLOW_EXPERIMENT_ID
+            value_from: "experiment"
+          # TODO: Set your Lakebase connection details (run: uv run quickstart)
+          - name: PGHOST
+            value: "${var.pghost}"
+          - name: PGDATABASE
+            value: "${var.pgdatabase}"
+          - name: PGUSER
+            value: "${var.pguser}"
+          - name: PGPORT
+            value: "5432"
+          - name: LAKEBASE_ENDPOINT_PATH
+            value: "${var.lakebase_endpoint_path}"
+          - name: LAKEBASE_AUTOSCALING_PROJECT
+            value: "${var.lakebase_project}"
+          - name: LAKEBASE_AUTOSCALING_BRANCH
+            value: "${var.lakebase_branch}"
+
+      # Resources which this app has access to
+      resources:
+        - name: 'experiment'
+          experiment:
+            # TODO: Set your MLflow experiment ID (run: uv run quickstart)
+            experiment_id: "${var.mlflow_experiment_id}"
+            permission: 'CAN_MANAGE'
+
+targets:
+  dev:
+    mode: development
+    default: true
+    # workspace:
+    #   host: https://...
+
+  prod:
+    mode: production
+    # workspace:
+    #   host: https://...
+    resources:
+      apps:
+        agent_openai_agents_sdk:
+          name: agent-openai-agents-sdk
