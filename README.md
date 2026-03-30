@@ -5,10 +5,10 @@ A conversational AI agent built with the **OpenAI Agents SDK** and deployed as a
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     Databricks App                          │
-│                                                             │
-│  ┌──────────────────┐       ┌────────────────────────────┐  │
+┌─────────────────────────────────────────────────────────────-┐
+│                     Databricks App                           │
+│                                                              │
+│  ┌──────────────────┐       ┌────────────────────────────-┐  │
 │  │   Next.js Chat   │       │    FastAPI / MLflow         │  │
 │  │   Frontend (UI)  │──────▶│    AgentServer (Backend)    │  │
 │  │   Port 3000      │ REST  │    Port 8000                │  │
@@ -24,18 +24,18 @@ A conversational AI agent built with the **OpenAI Agents SDK** and deployed as a
                                         │        │
                   ┌─────────────────────┘        └──────────────────┐
                   ▼                                                  ▼
-    ┌──────────────────────┐                       ┌──────────────────────────┐
-    │  Databricks LLM      │                       │  Lakebase (PostgreSQL)   │
-    │  (GPT-5-2 via        │                       │                          │
+    ┌──────────────────────-┐                       ┌──────────────────────────┐
+    │  Databricks LLM       │                       │  Lakebase (PostgreSQL)   │
+    │  (GPT-5-2 via         │                       │                          │
     │   Foundation Model    │                       │  Schema: agent_memory    │
     │   API)                │                       │  Table:  memories        │
-    └──────────────────────┘                       │  (user_id, key, value,   │
+    └──────────────────────-┘                       │  (user_id, key, value,   │
                                                     │   created_at, updated_at)│
-    ┌──────────────────────┐                       │                          │
+    ┌──────────────────────-┐                       │                          │
     │  MLflow Tracking      │                       │  Schema: ai_chatbot      │
     │  (Traces, Experiments,│                       │  Tables: Chat, Message,  │
     │   Evaluation)         │                       │          User, Vote      │
-    └──────────────────────┘                       └──────────────────────────┘
+    └──────────────────────-┘                       └──────────────────────────┘
 ```
 
 ## Per-User Data Isolation
