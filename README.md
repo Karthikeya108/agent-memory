@@ -435,3 +435,7 @@ Use an OAuth token, not a PAT. Run `databricks auth token --profile dev` to get 
 
 **Q: How do I grant the app SP access to Lakebase?**
 Run `scripts/grant_lakebase_permissions.py` with the SP client ID, or grant `CREATE` on the database and `ALL` on the required schemas (`agent_memory`, `ai_chatbot`, `drizzle`, `public`) via SQL.
+
+Disclaimer:
+- The sample app provided is intended to aid in getting started and may not be production-ready. The code does not have any guarantees/warantees/support. Use it at your own risk.
+- This repo contains AI generated elements.
